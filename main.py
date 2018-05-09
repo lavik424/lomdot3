@@ -393,7 +393,7 @@ def main():
 
 
 
-    hybridFeatures = pd.read_csv("finalSelection.csv")
+    hybridFeatures = pd.read_csv("finalSelection.csv") # the final features we selected
     hybridFeatures = list(hybridFeatures['Final_selection'])
     x_train_cat = x_train_cat[hybridFeatures]
     # Accuracy on validation-set TODO Step 11
@@ -434,30 +434,10 @@ def main():
     print("The Tree classifier accuracy is:", accuracy)
 
 
-
-    # display plots
-    # displayPlots(x_train, y_train)
-
-
-
-
-    # x_train_cat_number_only = x_train_cat.select_dtypes(include=np.number)
-    # 
-    # x_train_cat_number_only['Vote'] = y_train_cat
-    # x_train_cat_number_only = x_train_cat_number_only.dropna(axis=0, how='any')
-    # 
-    # stats.plotPCA(x_train_cat_number_only.drop(columns=['Vote']), x_train_cat_number_only['Vote'])
-    #
-
-    # calculate MI between each feature and label
-    # for c in x_train_cat_number_only.columns:
-    #     if c != 'Vote':
-    #         print(c, "vs label", stats.mutualInformation(x_train_cat_number_only['Vote'],
-    #                                                      MinMaxScaler().fit_transform(x_train_cat_number_only[c].reshape(-1,1))))
-
-    # create correlation matrices and graphs between each pair in feature list
-    # res = creatColVsColCorrelationMatrix(x_train_cat_number_only)
-    # drawColVsColScatterPlot(x_train_cat_number_only,x_train_cat_number_only['Vote'])
+    rightList = ["Yearly_IncomeKFillByMean","Number_of_valued_Kneset_membersFillByMedian",
+                 "Overall_happiness_scoreFillByMean","Garden_sqr_meter_per_person_in_residancy_areaFillByMean",
+                 "Most_Important_IssueFillByMode_","Weighted_education_rank",
+                 "Will_vote_only_large_partyFillByMode_","Avg_Satisfaction_with_previous_vote"]
 
 
 
