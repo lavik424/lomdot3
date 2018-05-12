@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
-
-
+from sklearn.neighbors import KNeighborsClassifier
+from modelTesting import clfMetricCalculator
 
 
 def chooseColumns(currCols,oldCols):
@@ -40,11 +40,14 @@ def chooseRightColumns(colsAfterWork):
 
 
 
-def loadEnvirment(oldCols):
+def loadEnvirment():
     """
 
     :return: 6 dataFrames train, validarion and test x/y
     """
+
+    df = pd.read_csv("./ElectionsData.csv")
+    oldCols = df.columns
 
     ## load tables from prev hw
     x_train = pd.read_csv("./input/x_train.csv" ,index_col=0)
@@ -70,12 +73,17 @@ def loadEnvirment(oldCols):
 
 
 def main():
-    df = pd.read_csv("./ElectionsData.csv")
-    oldCols = df.columns
-    t = (x_train, x_val, x_test, y_train, y_val, y_test) = loadEnvirment(oldCols)
 
-    for df in t:
-        df.info()
+    (x_train, x_val, x_test, y_train, y_val, y_test) = loadEnvirment()
+
+    ## testing model calculator
+    estimator = KNeighborsClassifier(n_neighbors=5)
+    partiesLabels = y_train.iloc[:, 0].unique()
+    metric,confusionMatrix = clfMetricCalculator(estimator,x_train,y_train)
+    print(metric)
+    # make nice confusion matrix with labels
+    confusionMatrix = pd.DataFrame(confusionMatrix,columns=partiesLabels,index=partiesLabels)
+    print(confusionMatrix)
 
 
 
