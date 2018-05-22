@@ -338,13 +338,13 @@ def main():
     # print(len(colsAfterWork))
     # exit(4)
 
-    # Relief Algorithm TODO Step 8
-    print('Entering stage 8: Relief Algorithm')
-    numOfSamplesForRelief = [5]
-    for i in numOfSamplesForRelief:
-        print('Starting relief with',i,'iterations')
-        reliefRes = reliefFeatureSelection(x_train_cat, y_train_cat,numOfRowsToSample=i)
-        pd.DataFrame(reliefRes).to_csv("./relief"+str(i)+".csv")
+    # # Relief Algorithm TODO Step 8
+    # print('Entering stage 8: Relief Algorithm')
+    # numOfSamplesForRelief = [5]
+    # for i in numOfSamplesForRelief:
+    #     print('Starting relief with',i,'iterations')
+    #     reliefRes = reliefFeatureSelection(x_train_cat, y_train_cat,numOfRowsToSample=i)
+    #     pd.DataFrame(reliefRes).to_csv("./relief"+str(i)+".csv")
 
     ## tring feafures selected by RELIEF
     # featuresFromRelief = ["Most_Important_IssueFillByMode_Financial","OccupationFillByMode_Student_or_Unemployed",
@@ -364,74 +364,74 @@ def main():
     # exit(8)
 
 
-    # Decision tree Algorithm TODO Step 9
-    print('Entering stage 9: Decision tree Algorithm')
-    treeRankedFeatures,confusionMatrix = embeddedDecisionTree(x_train_cat, y_train_cat)
-    # make nice confusion matrix with labels
-    confusionMatrix = pd.DataFrame(confusionMatrix,columns=partiesLabels,index=partiesLabels)
-    print('The Confusion Matrix of tree is:\n',confusionMatrix)
-    confusionMatrix.to_csv('./confusionMatrixTree.csv')
-    print('Features ranked by Decision tree:\n',treeRankedFeatures)
-    pd.DataFrame(treeRankedFeatures).to_csv("./treeRankedFeatures.csv")
+    # # Decision tree Algorithm TODO Step 9
+    # print('Entering stage 9: Decision tree Algorithm')
+    # treeRankedFeatures,confusionMatrix = embeddedDecisionTree(x_train_cat, y_train_cat)
+    # # make nice confusion matrix with labels
+    # confusionMatrix = pd.DataFrame(confusionMatrix,columns=partiesLabels,index=partiesLabels)
+    # print('The Confusion Matrix of tree is:\n',confusionMatrix)
+    # confusionMatrix.to_csv('./confusionMatrixTree.csv')
+    # print('Features ranked by Decision tree:\n',treeRankedFeatures)
+    # pd.DataFrame(treeRankedFeatures).to_csv("./treeRankedFeatures.csv")
+    #
+    #
+    # # SFS Algorithm TODO Step 10
+    # print('Entering stage 10: SFS Algorithm')
+    # # estimator = KNeighborsClassifier(n_neighbors=5)
+    # estimator = tree.DecisionTreeClassifier(criterion="entropy")
+    # # print('Accuracy from KNN:',scoreForClassfier(estimator,x_train_cat,y_train_cat))
+    #
+    # numOfFeaturesToSelect = 30
+    # sfsSelection = sfs(x_train_cat,y_train_cat,k=numOfFeaturesToSelect,
+    #                    clf=estimator,score=scoreForClassfier)
+    # print(sfsSelection)
+    # sfsFeaturesNames = []
+    # for index in sfsSelection:
+    #     sfsFeaturesNames.append(colsAfterWork[index])
+    # print('SFS has selected those features in this order:\n',sfsFeaturesNames)
+    # pd.DataFrame(sfsFeaturesNames).to_csv("./sfsFeaturesNameTree.csv")
 
 
-    # SFS Algorithm TODO Step 10
-    print('Entering stage 10: SFS Algorithm')
+
+    # hybridFeatures = pd.read_csv("finalSelection.csv") # the final features we selected
+    # hybridFeatures = list(hybridFeatures['Final_selection'])
+    # x_train_cat = x_train_cat[hybridFeatures]
+    # # Accuracy on validation-set TODO Step 11
+    # print('Entering stage 11: \tD-Day\nAccuracy on validation-set')
+    # # Load validation/test-set after preprocessing workflow
+    # x_val_cat = pd.read_csv("x_val_cat.csv",index_col=0)
+    # y_val_cat = pd.read_csv("y_val.csv",index_col=0)
+    # x_test_cat = pd.read_csv("x_test_cat.csv",index_col=0)
+    # y_test_cat = pd.read_csv("y_test.csv",index_col=0)
+    #
+    # x_val_cat = x_val_cat[hybridFeatures]
+    # x_test_cat = x_test_cat[hybridFeatures]
+    #
+    #
+    # # save after all changes and the final features selection
+    # x_train_final = x_train_cat
+    # x_train_final['Vote'] = y_train_cat.values
+    #
+    # x_val_final = x_val_cat
+    # x_val_final['Vote'] = y_val_cat.values
+    #
+    # x_test_final = x_test_cat
+    # x_test_final['Vote'] = y_test_cat.values
+
+    # # Save
+    # x_train_final.to_csv("./x_train_final.csv")
+    # x_val_final.to_csv("./x_val_final.csv")
+    # x_test_final.to_csv("./x_test_final.csv")
+
+    # # train knn and tree and test on validation
     # estimator = KNeighborsClassifier(n_neighbors=5)
-    estimator = tree.DecisionTreeClassifier(criterion="entropy")
-    # print('Accuracy from KNN:',scoreForClassfier(estimator,x_train_cat,y_train_cat))
-
-    numOfFeaturesToSelect = 30
-    sfsSelection = sfs(x_train_cat,y_train_cat,k=numOfFeaturesToSelect,
-                       clf=estimator,score=scoreForClassfier)
-    print(sfsSelection)
-    sfsFeaturesNames = []
-    for index in sfsSelection:
-        sfsFeaturesNames.append(colsAfterWork[index])
-    print('SFS has selected those features in this order:\n',sfsFeaturesNames)
-    pd.DataFrame(sfsFeaturesNames).to_csv("./sfsFeaturesNameTree.csv")
-
-
-
-    hybridFeatures = pd.read_csv("finalSelection.csv") # the final features we selected
-    hybridFeatures = list(hybridFeatures['Final_selection'])
-    x_train_cat = x_train_cat[hybridFeatures]
-    # Accuracy on validation-set TODO Step 11
-    print('Entering stage 11: \tD-Day\nAccuracy on validation-set')
-    # Load validation/test-set after preprocessing workflow
-    x_val_cat = pd.read_csv("x_val_cat.csv",index_col=0)
-    y_val_cat = pd.read_csv("y_val.csv",index_col=0)
-    x_test_cat = pd.read_csv("x_test_cat.csv",index_col=0)
-    y_test_cat = pd.read_csv("y_test.csv",index_col=0)
-
-    x_val_cat = x_val_cat[hybridFeatures]
-    x_test_cat = x_test_cat[hybridFeatures]
-
-
-    # save after all changes and the final features selection
-    x_train_final = x_train_cat
-    x_train_final['Vote'] = y_train_cat.values
-
-    x_val_final = x_val_cat
-    x_val_final['Vote'] = y_val_cat.values
-
-    x_test_final = x_test_cat
-    x_test_final['Vote'] = y_test_cat.values
-
-    # Save
-    x_train_final.to_csv("./x_train_final.csv")
-    x_val_final.to_csv("./x_val_final.csv")
-    x_test_final.to_csv("./x_test_final.csv")
-
-    # train knn and tree and test on validation
-    estimator = KNeighborsClassifier(n_neighbors=5)
-    estimator.fit(x_train_cat, y_train_cat)
-    accuracy = accuracy_score(y_val_cat, estimator.predict(x_val_cat))
-    print("The KNN classifier accuracy is:",accuracy)
-    estimator = tree.DecisionTreeClassifier(criterion="entropy")
-    estimator.fit(x_train_cat, y_train_cat)
-    accuracy = accuracy_score(y_val_cat, estimator.predict(x_val_cat))
-    print("The Tree classifier accuracy is:", accuracy)
+    # estimator.fit(x_train_cat, y_train_cat)
+    # accuracy = accuracy_score(y_val_cat, estimator.predict(x_val_cat))
+    # print("The KNN classifier accuracy is:",accuracy)
+    # estimator = tree.DecisionTreeClassifier(criterion="entropy")
+    # estimator.fit(x_train_cat, y_train_cat)
+    # accuracy = accuracy_score(y_val_cat, estimator.predict(x_val_cat))
+    # print("The Tree classifier accuracy is:", accuracy)
 
 
 if __name__ == '__main__':

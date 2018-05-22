@@ -46,11 +46,12 @@ def clfMetricCalculator(clf,X:pd.DataFrame,Y:pd.DataFrame,numOfSplits=4):
         clf.fit(features_train, classification_train)
         # test the tree on validation set
         pred = clf.predict(features_test)
+        pred = pd.DataFrame(pred, index=classification_test.index) # convert into col vector and match index
 
         totalAccuracy += accuracy_score(classification_test, pred)
-        totalF1 += f1_score(classification_test, pred, average='micro')
-        totalPrecision += precision_score(classification_test, pred, average='micro')
-        totalRecall += recall_score(classification_test, pred, average='micro')
+        totalF1 += f1_score(classification_test, pred, average='weighted')
+        totalPrecision += precision_score(classification_test, pred, average='weighted')
+        totalRecall += recall_score(classification_test, pred, average='weighted')
         totalConfusion += confusion_matrix(classification_test.values, pred, labels=partiesLabels)
 
 
