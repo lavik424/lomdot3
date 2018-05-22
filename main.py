@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.neighbors import KNeighborsClassifier
-from modelTesting import clfMetricCalculator
+from modelTesting import *
 import matplotlib.pyplot as plt
 
 
@@ -84,23 +84,35 @@ def modifiedHistogram(cm:pd.DataFrame,labels):
 
 
 
+
 def main():
 
     (x_train, x_val, x_test, y_train, y_val, y_test) = loadEnvirment()
 
-    ## testing model calculator
-    estimator = KNeighborsClassifier(n_neighbors=5)
-    partiesLabels = y_train.iloc[:, 0].unique()
-    metric,confusionMatrix = clfMetricCalculator(estimator,x_train,y_train)
-    print(metric)
-    # make nice confusion matrix with labels
-    confusionMatrix = pd.DataFrame(confusionMatrix,columns=partiesLabels,index=partiesLabels)
-    print(confusionMatrix)
 
-    modifiedHistogram(confusionMatrix,partiesLabels)
+    # modifiedHistogram(confusionMatrix,partiesLabels)
+    import warnings
+    warnings.filterwarnings("ignore") # todo fun ignoring that shit
 
+    hyperParamtersTree = {'weighted':None,'macro':None}
+    hyperParamtersKNN = {'weighted': None, 'macro': None}
 
+    for method in ['weighted','macro']:
+        hyperParamtersTree[method],_ = hyperParamsForTree(x_train,y_train)
+        # print('For Tree-with this set:\n', hyperParamtersTree[method])
+        # print('we achived this accuracy\n', accuracy)
 
+        hyperParamtersKNN[method],_ = hyperParamsForKNN(x_train, y_train)
+        # print('For KNN-with this set:\n', hyperParamtersKNN[method])
+        # print('we achived this accuracy\n', accuracy)
+
+    trainWithBestHyperparamsTree(hyperParamtersTree,x_train,y_train)
+    trainWithBestHyperparamsKNN(hyperParamtersKNN,x_train,y_train)
+    # print('Hyper for Tree:',hyperParamtersTree)
+    # print('Hyper for KNN:', hyperParamtersKNN)
+    # bestSet,accuracy = hyperParamsForRF(x_train,y_train)
+    # print('For RF-with this set:\n', bestSet)
+    # print('we achived this accuracy\n', accuracy)
 
 if __name__ == '__main__':
     main()

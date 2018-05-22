@@ -6,6 +6,7 @@ from sklearn.preprocessing import MinMaxScaler
 from util import *
 import stats
 from featureSelection import *
+import os
 
 from sfs import sfs
 from relief import reliefFeatureSelection
@@ -216,20 +217,21 @@ def main():
     x_val, x_test, y_val, y_test = train_test_split(x_testVal, y_testVal, train_size=0.6, test_size=0.4)
 
 
-    # save before any changes
-    x_train_final = x_train
-    x_train_final['Vote'] = y_train.values
-    x_val_final = x_val
-    x_val_final['Vote'] = y_val.values
-    x_test_final = x_test
-    x_test_final['Vote'] = y_test.values
-    # Save labels
-    x_train_final.to_csv("./x_train_final.csv")
-    x_val_final.to_csv("./x_val_final.csv")
-    x_test_final.to_csv("./x_test_final.csv")
-    y_train.to_csv("./y_train.csv")
-    y_val.to_csv("./y_val.csv")
-    y_test.to_csv("./y_test.csv")
+    # # save before any changes
+    # x_train_final = x_train
+    # x_train_final['Vote'] = y_train.values
+    # x_val_final = x_val
+    # x_val_final['Vote'] = y_val.values
+    # x_test_final = x_test
+    # x_test_final['Vote'] = y_test.values
+    # # Save labels
+    # os.makedirs("./input2", exist_ok=True)
+    # x_train_final.to_csv("./input2/x_train.csv")
+    # x_val_final.to_csv("./input2/x_val.csv")
+    # x_test_final.to_csv("./input2/x_test.csv")
+    # y_train.to_csv("./input2/y_train.csv")
+    # y_val.to_csv("./input2/y_val.csv")
+    # y_test.to_csv("./input2/y_test.csv")
 
 
 
@@ -315,9 +317,9 @@ def main():
         x_val_cat = fillNATestValMeanMedian(x_val_cat,col,'Mean')
         x_test_cat = fillNATestValMeanMedian(x_test_cat,col,'Mean')
 
-    x_train_cat.to_csv("./x_train_cat.csv")
-    x_val_cat.to_csv("./x_val_cat.csv")
-    x_test_cat.to_csv("./x_test_cat.csv")
+    x_train_cat.to_csv("./input2/x_train_cat.csv")
+    x_val_cat.to_csv("./input2/x_val_cat.csv")
+    x_test_cat.to_csv("./input2/x_test_cat.csv")
 
 
     ### Methdic Stop - start again from here###
