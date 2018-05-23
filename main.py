@@ -1,6 +1,9 @@
 import numpy as np
 import pandas as pd
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import tree
+
+from TreePlot import plotTree
 from modelTesting import *
 import matplotlib.pyplot as plt
 
@@ -71,24 +74,20 @@ def loadEnvirment():
 
 
 def modifiedHistogram(cm:pd.DataFrame,labels):
-    counts = {x:np.sum(cm.loc[:,x]) for x in labels} # sum each col separately (predicted num of voters for each party)
+    counts = {x:np.sum(cm.loc[x,:]) for x in labels} # sum each col separately (predicted num of voters for each party)
 
-    plt.plot(np.arange(10))
-    plt.show()
-    # plt.bar(np.arange(len(labels)), counts.values(), align='center')
-    # plt.xticks(np.arange(len(labels)), counts.keys())
-    # plt.savefig("./sddf.png")
+    # plt.plot(np.arange(10))
     # plt.show()
+    plt.bar(np.arange(len(labels)), counts.values(), align='center')
+    plt.xticks(np.arange(len(labels)), counts.keys())
+    # plt.savefig("./sddf.png")
+    plt.show()
     print('done')
-
-
-
 
 
 def main():
 
     (x_train, x_val, x_test, y_train, y_val, y_test) = loadEnvirment()
-
 
     # modifiedHistogram(confusionMatrix,partiesLabels)
     import warnings
@@ -110,6 +109,23 @@ def main():
     for type in clfTypes:
         trainWithBestHyperparams(type,hyperParamters[type],x_train,y_train)
 
+    # ## testing model calculator
+    # # estimator = KNeighborsClassifier(n_neighbors=5)
+    # estimator = tree.DecisionTreeClassifier(criterion="entropy", min_impurity_split=0.5, min_samples_split=0.005)
+    # partiesLabels = y_train.iloc[:, 0].unique()
+    # metric,confusionMatrix, estimator = clfMetricCalculator(estimator,x_train,y_train)
+    # print(metric)
+    # # make nice confusion matrix with labels
+    # confusionMatrix = pd.DataFrame(confusionMatrix,columns=partiesLabels,index=partiesLabels)
+    # print(confusionMatrix)
+    #
+    #
+    # # modifiedHistogram(confusionMatrix,partiesLabels)
+    #
+    #
+    # labelsForTree = ['Blues', 'Browns', 'Greens', 'Greys', 'Oranges', 'Pinks',
+    #                  'Purples', 'Reds', 'Turquoises', 'Whites', 'Yellows']
+    # plotTree(estimator, x_train.columns, labelsForTree)
 
 
 if __name__ == '__main__':

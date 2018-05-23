@@ -22,10 +22,10 @@ def plotTree(dtree:DecisionTreeClassifier, features_names, classes_names):
                     filled=True, rounded=True,
                     special_characters=True)
 
-    print(dot_data.getvalue())
+    # print(dot_data.getvalue())
 
     graph = graphviz.Source(dot_data.getvalue())
-
+    graph.format = "jpeg"
     graph.render(view=True, cleanup=True)
     # graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
     # Image(graph.create_png())

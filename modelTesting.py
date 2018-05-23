@@ -67,7 +67,8 @@ def clfMetricCalculator(clf,X:pd.DataFrame,Y:pd.DataFrame,avgMethod='weighted',n
 
     # print('Total Accuracy of tree is:',totalAccuracy)
 
-    return metricMap,totalConfusion
+    clf.fit(X, Y)
+    return metricMap, totalConfusion, clf
 
 
 
@@ -210,6 +211,3 @@ def trainWithBestHyperparams(clfType,methodDict,x_train,y_train):
         # confusionMatrix = pd.DataFrame(confusionMatrix,columns=partiesLabels,index=partiesLabels)
         # f.write(confusionMatrix)
     # f.close()
-
-
-

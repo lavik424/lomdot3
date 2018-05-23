@@ -216,23 +216,20 @@ def main():
     x_train, x_testVal, y_train, y_testVal = train_test_split(X, Y)
     x_val, x_test, y_val, y_test = train_test_split(x_testVal, y_testVal, train_size=0.6, test_size=0.4)
 
-
-    # # save before any changes
-    # x_train_final = x_train
-    # x_train_final['Vote'] = y_train.values
-    # x_val_final = x_val
-    # x_val_final['Vote'] = y_val.values
-    # x_test_final = x_test
-    # x_test_final['Vote'] = y_test.values
-    # # Save labels
-    # os.makedirs("./input2", exist_ok=True)
-    # x_train_final.to_csv("./input2/x_train.csv")
-    # x_val_final.to_csv("./input2/x_val.csv")
-    # x_test_final.to_csv("./input2/x_test.csv")
-    # y_train.to_csv("./input2/y_train.csv")
-    # y_val.to_csv("./input2/y_val.csv")
-    # y_test.to_csv("./input2/y_test.csv")
-
+    # save before any changes
+    x_train_final = x_train.copy()
+    x_train_final['Vote'] = y_train.values
+    x_val_final = x_val.copy()
+    x_val_final['Vote'] = y_val.values
+    x_test_final = x_test.copy()
+    x_test_final['Vote'] = y_test.values
+    # Save labels
+    x_train_final.to_csv("./x_train_final.csv")
+    x_val_final.to_csv("./x_val_final.csv")
+    x_test_final.to_csv("./x_test_final.csv")
+    y_train.to_csv("./y_train.csv")
+    y_val.to_csv("./y_val.csv")
+    y_test.to_csv("./y_test.csv")
 
 
     # Fill nan in category type TODO Step 1
