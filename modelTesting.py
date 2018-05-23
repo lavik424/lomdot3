@@ -142,6 +142,37 @@ def hyperParamsForKNN(x_train,y_train,avgMethod='weighted'):
     return bestSetOfParams,bestMeasure
 
 
+def measuresWithoutKFold(clf,x_train,y_train,x_val,y_val,avgMethod='weighted'):
+    """
+
+    :param clf:
+    :param x_train:
+    :param y_train:
+    :param x_val:
+    :param y_val:
+    :param avgMethod:
+    :return:
+    """
+    numOflabels = y_train.iloc[:,0].nunique() # Y should contain only one column - label column
+    confusionMatrix = np.zeros((numOflabels, numOflabels))
+
+    partiesLabels = y_train.iloc[:,0].unique()
+
+    # train the clf on X set
+    clf.fit(x_train,y_train)
+    # test the tree on validation set
+    pred = clf.predict(x_val)
+    pred = pd.DataFrame(pred, index=y_val.index)  # convert into col vector and match index
+
+    confusionMatrix = confusion_matrix(y_val.values, pred, labels=partiesLabels)
+
+    accuracy = accuracy_score(y_val, pred)
+    f1 = f1_score(y_val, pred, average=avgMethod)
+    precision = precision_score(y_val, pred, average=avgMethod)
+    recall = recall_score(y_val, pred, average=avgMethod)
+    metricMap = {'Accuracy': accuracy, 'F1': f1, 'Precision': precision, 'Recall': recall}
+
+    return metricMap,confusionMatrix
 
 def trainWithBestHyperparams(clfType,methodDict,x_train,y_train):
     """
@@ -163,7 +194,7 @@ def trainWithBestHyperparams(clfType,methodDict,x_train,y_train):
             estimator = tree.DecisionTreeClassifier(criterion="entropy", **methodDict[method])
         if clfType == 'RF':
             estimator = RandomForestClassifier(criterion="entropy", **methodDict[method])
-        metric,confusionMatrix = clfMetricCalculator(estimator,x_train,y_train,avgMethod=method)
+        metric,confusionMatrix = measuresWithoutKFold(estimator,x_train,y_train,avgMethod=method)
         # line = '\tIn' + method + 'method'
         # f.write(line)
         print('\tIn',method,'method')
@@ -173,7 +204,7 @@ def trainWithBestHyperparams(clfType,methodDict,x_train,y_train):
         # f.write('achivhed with those hyperparams:')
         print('achieved with those hyperparams:')
         # f.write(str(**methodDict[method]))
-        print(**methodDict[method])
+        print(methodDict[method])
         # # make nice confusion matrix with labels
         # partiesLabels = y_train.iloc[:, 0].unique()
         # confusionMatrix = pd.DataFrame(confusionMatrix,columns=partiesLabels,index=partiesLabels)

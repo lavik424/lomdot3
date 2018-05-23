@@ -94,7 +94,7 @@ def main():
     import warnings
     warnings.filterwarnings("ignore") # todo fun ignoring that shit
 
-    clfTypes = ['Tree','KNN']#,'RF']
+    clfTypes = ['Tree','KNN','RF']
     hyperParamters = {type:{'weighted':None,'macro':None} for type in clfTypes}
     averageMethodsForMeasures = ['weighted','macro'] #,'samples']
 
