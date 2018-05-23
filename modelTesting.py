@@ -90,7 +90,7 @@ def hyperParamsForTreeOrRF(clfType,x_train,y_train,avgMethod='weighted'):
     :param clfType: 'Tree' for tree or 'RF' for random forest
     :param x_train:
     :param y_train:
-    :param avgMethod: from ['weighted','macro','samples'] , differs from one classification to another
+    :param avgMethod: from ['weighted','macro'] , differs from one classification to another
     :return:
     """
     if clfType == 'Tree':
@@ -123,7 +123,7 @@ def hyperParamsForKNN(x_train,y_train,avgMethod='weighted'):
     Function that find best hyperparams for KNN
     :param x_train:
     :param y_train:
-    :param avgMethod:
+    :param avgMethod: from ['weighted','macro'] , differs from one classification to another
     :return:
     """
     hyperParams = {'n_neighbors':[3,30]}
@@ -146,12 +146,12 @@ def hyperParamsForKNN(x_train,y_train,avgMethod='weighted'):
 def measuresWithoutKFold(clf,x_train,y_train,x_val,y_val,avgMethod='weighted'):
     """
 
-    :param clf:
-    :param x_train:
-    :param y_train:
-    :param x_val:
-    :param y_val:
-    :param avgMethod:
+    :param clf: initialized clf
+    :param x_train: for the training
+    :param y_train: for the training
+    :param x_val: to measure performances
+    :param y_val: to measure performance
+    :param avgMethod: from ['weighted','macro'] , differs from one classification to another
     :return:
     """
     numOflabels = y_train.iloc[:,0].nunique() # Y should contain only one column - label column
@@ -175,11 +175,11 @@ def measuresWithoutKFold(clf,x_train,y_train,x_val,y_val,avgMethod='weighted'):
 
     return metricMap,confusionMatrix
 
-def trainWithBestHyperparams(clfType,methodDict,x_train,y_train):
+def trainWithBestHyperparams(clfType,methodDict,x_train,y_train,x_val,y_val):
     """
     Function that train one clf by his hyperparams and returns his measurements
     :param clfType: 'Tree' for tree, 'RF' for random forest and 'KNN' for KNN
-    :param methodDict: from ['weighted','macro','samples'] , differs from one classification task to another
+    :param methodDict: from ['weighted','macro'] , differs from one classification task to another
     :param x_train:
     :param y_train:
     :return:
@@ -195,7 +195,7 @@ def trainWithBestHyperparams(clfType,methodDict,x_train,y_train):
             estimator = tree.DecisionTreeClassifier(criterion="entropy", **methodDict[method])
         if clfType == 'RF':
             estimator = RandomForestClassifier(criterion="entropy", **methodDict[method])
-        metric,confusionMatrix = measuresWithoutKFold(estimator,x_train,y_train,avgMethod=method)
+        metric,confusionMatrix = measuresWithoutKFold(estimator,x_train,y_train,x_val,y_val,avgMethod=method)
         # line = '\tIn' + method + 'method'
         # f.write(line)
         print('\tIn',method,'method')

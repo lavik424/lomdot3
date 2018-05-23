@@ -107,7 +107,7 @@ def main():
 
     # train the classifers with the best set of hyperparams
     for type in clfTypes:
-        trainWithBestHyperparams(type,hyperParamters[type],x_train,y_train)
+        trainWithBestHyperparams(type,hyperParamters[type],x_train,y_train,x_val,y_val)
 
     # ## testing model calculator
     # # estimator = KNeighborsClassifier(n_neighbors=5)
