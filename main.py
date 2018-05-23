@@ -94,25 +94,23 @@ def main():
     import warnings
     warnings.filterwarnings("ignore") # todo fun ignoring that shit
 
-    hyperParamtersTree = {'weighted':None,'macro':None}
-    hyperParamtersKNN = {'weighted': None, 'macro': None}
+    clfTypes = ['Tree','KNN']#,'RF']
+    hyperParamters = {type:{'weighted':None,'macro':None} for type in clfTypes}
+    averageMethodsForMeasures = ['weighted','macro'] #,'samples']
 
-    for method in ['weighted','macro']:
-        hyperParamtersTree[method],_ = hyperParamsForTree(x_train,y_train)
-        # print('For Tree-with this set:\n', hyperParamtersTree[method])
-        # print('we achived this accuracy\n', accuracy)
+    # train to find best hyperparameters for classifiers with different avg methods
+    for method in averageMethodsForMeasures:
+        for type in clfTypes:
+            if type in ['Tree', 'RF']:
+                hyperParamters[type][method],_ = hyperParamsForTreeOrRF(type,x_train,y_train,method)
+            else:
+                hyperParamters[type][method],_ = hyperParamsForKNN(x_train,y_train,method)
 
-        hyperParamtersKNN[method],_ = hyperParamsForKNN(x_train, y_train)
-        # print('For KNN-with this set:\n', hyperParamtersKNN[method])
-        # print('we achived this accuracy\n', accuracy)
+    # train the classifers with the best set of hyperparams
+    for type in clfTypes:
+        trainWithBestHyperparams(type,hyperParamters[type],x_train,y_train)
 
-    trainWithBestHyperparamsTree(hyperParamtersTree,x_train,y_train)
-    trainWithBestHyperparamsKNN(hyperParamtersKNN,x_train,y_train)
-    # print('Hyper for Tree:',hyperParamtersTree)
-    # print('Hyper for KNN:', hyperParamtersKNN)
-    # bestSet,accuracy = hyperParamsForRF(x_train,y_train)
-    # print('For RF-with this set:\n', bestSet)
-    # print('we achived this accuracy\n', accuracy)
+
 
 if __name__ == '__main__':
     main()

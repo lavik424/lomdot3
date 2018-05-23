@@ -47,11 +47,13 @@ def clfMetricCalculator(clf,X:pd.DataFrame,Y:pd.DataFrame,avgMethod='weighted',n
         pred = clf.predict(features_test)
         pred = pd.DataFrame(pred, index=classification_test.index) # convert into col vector and match index
 
+        totalConfusion += confusion_matrix(classification_test.values, pred, labels=partiesLabels)
+
         totalAccuracy += accuracy_score(classification_test, pred)
         totalF1 += f1_score(classification_test, pred, average=avgMethod)
         totalPrecision += precision_score(classification_test, pred, average=avgMethod)
         totalRecall += recall_score(classification_test, pred, average=avgMethod)
-        totalConfusion += confusion_matrix(classification_test.values, pred, labels=partiesLabels)
+
 
 
     # calculate metric and confusion matrix
@@ -73,112 +75,110 @@ def clfMetricCalculator(clf,X:pd.DataFrame,Y:pd.DataFrame,avgMethod='weighted',n
 
 def randomHyperParamsForClassifier(params):
     """
-
-    :param params: shold be a dict with name of hyper param and list of 2 index0 - lower bound, index1 upper bound
+    function to generate random number (int\float) for every hyperparams
+    :param params: should be a dict with name of hyper param and list of 2 index0 - lower bound, index1 upper bound
     :return: dict with the name and the randomize value
     """
     return {p:(np.random.randint(value[0],value[1]) if isinstance(value[0],int)
                          else np.random.uniform(value[0],value[1])) for p,value in params.items()}
 
 
-def hyperParamsForTree(x_train,y_train,avgMethod='weighted'):
-
-    hyperParams = {'min_impurity_split':[0.0,1.0], 'min_samples_split':[0.0001,0.05]}
-    bestSetOfParams = {'min_impurity_split':0, 'min_samples_split':0}
-    # hyperParams = {'min_impurity_decrease':[0.0,1.0], 'min_samples_split':[0.0001,0.05]}
-    # bestSetOfParams = {'min_impurity_decrease':0, 'min_samples_split':0}
-    bestAccuracy = 0
+def hyperParamsForTreeOrRF(clfType,x_train,y_train,avgMethod='weighted'):
+    """
+    function that train and find best hyperparams for RF/Tree
+    :param clfType: 'Tree' for tree or 'RF' for random forest
+    :param x_train:
+    :param y_train:
+    :param avgMethod: from ['weighted','macro','samples'] , differs from one classification to another
+    :return:
+    """
+    if clfType == 'Tree':
+        hyperParams = {'min_impurity_split':[0.0,1.0], 'min_samples_split':[0.0001,0.05]}
+        bestSetOfParams = {'min_impurity_split':0, 'min_samples_split':0}
+    if clfType == 'RF':
+        hyperParams = {'min_impurity_split': [0.0, 1.0], 'min_samples_split': [0.0001, 0.05], 'n_estimators': [10, 150]}
+        bestSetOfParams = {'min_impurity_split': 0, 'min_samples_split': 0, 'n_estimators': 0}
+    measureToCompare = 'F1' if avgMethod == 'macro' else 'Accuracy'
+    bestMeasure = 0
     for i in range(100):
         currSetOfParams = randomHyperParamsForClassifier(hyperParams)
-        estimator = tree.DecisionTreeClassifier(criterion="entropy",**currSetOfParams)
+        if clfType == 'RF':
+            print('Starting iteration number:', i)
+            estimator = RandomForestClassifier(criterion="entropy", **currSetOfParams)
+        if clfType == 'Tree':
+            estimator = tree.DecisionTreeClassifier(criterion="entropy",**currSetOfParams)
         metric, _ = clfMetricCalculator(estimator, x_train, y_train,avgMethod)
         # print('with this set:\n',currSetOfParams)
         # print('we achived those scores\n',metric)
-        if bestAccuracy < metric['Accuracy']:
-            bestAccuracy = metric['Accuracy']
+        if bestMeasure < metric[measureToCompare]:
+            bestMeasure = metric[measureToCompare]
             bestSetOfParams = currSetOfParams
 
-    return bestSetOfParams,bestAccuracy
+    return bestSetOfParams,bestMeasure
 
 
 def hyperParamsForKNN(x_train,y_train,avgMethod='weighted'):
-
+    """
+    Function that find best hyperparams for KNN
+    :param x_train:
+    :param y_train:
+    :param avgMethod:
+    :return:
+    """
     hyperParams = {'n_neighbors':[3,30]}
     bestSetOfParams = {'n_neighbors': 0}
-    bestAccuracy = 0
-    for i in range(3,30):
+    measureToCompare = 'Accuracy' if avgMethod == 'weighted' else 'F1'
+    bestMeasure = 0
+    for i in range(3,30,2):
         currSetOfParams = {'n_neighbors': i}
         estimator = KNeighborsClassifier(**currSetOfParams)
         metric, _ = clfMetricCalculator(estimator, x_train, y_train,avgMethod)
         # print('with this set:\n',currSetOfParams)
         # print('we achived those scores\n',metric)
-        if bestAccuracy < metric['Accuracy']:
-            bestAccuracy = metric['Accuracy']
+        if bestMeasure < metric[measureToCompare]:
+            bestMeasure = metric[measureToCompare]
             bestSetOfParams = currSetOfParams
 
-    return bestSetOfParams,bestAccuracy
+    return bestSetOfParams,bestMeasure
 
 
 
-def hyperParamsForRF(x_train,y_train,avgMethod='weighted'):
-
-    hyperParams = {'min_impurity_split':[0.0,1.0], 'min_samples_split':[0.0001,0.05],'n_estimators':[10,150]}
-    bestSetOfParams = {'min_impurity_split':0, 'min_samples_split':0,'n_estimators':0}
-    # hyperParams = {'min_impurity_decrease':[0.0,1.0], 'min_samples_split':[0.0001,0.05]}
-    # bestSetOfParams = {'min_impurity_decrease':0, 'min_samples_split':0}
-    bestAccuracy = 0
-    for i in range(100):
-        print('Starting iteration number:',i)
-        currSetOfParams = randomHyperParamsForClassifier(hyperParams)
-        estimator = RandomForestClassifier(criterion="entropy",**currSetOfParams)
-        metric, _ = clfMetricCalculator(estimator, x_train, y_train,avgMethod)
-        # print('with this set:\n',currSetOfParams)
-        # print('we achived those scores\n',metric)
-        if bestAccuracy < metric['Accuracy']:
-            bestAccuracy = metric['Accuracy']
-            bestSetOfParams = currSetOfParams
-
-    return bestSetOfParams,bestAccuracy
-
-
-
-def trainWithBestHyperparamsKNN(methodDict,x_train,y_train):
+def trainWithBestHyperparams(clfType,methodDict,x_train,y_train):
     """
-
-    :param methodDict:
+    Function that train one clf by his hyperparams and returns his measurements
+    :param clfType: 'Tree' for tree, 'RF' for random forest and 'KNN' for KNN
+    :param methodDict: from ['weighted','macro','samples'] , differs from one classification task to another
     :param x_train:
     :param y_train:
     :return:
     """
-    print('\tKNN')
+    # f = open('./output','w')
+    # line = '\t' + clfType
+    # f.write(line)
+    print('\t',clfType)
     for method in methodDict:
-        estimator = KNeighborsClassifier(**methodDict[method])
+        if clfType == 'KNN':
+            estimator = KNeighborsClassifier(**methodDict[method])
+        if clfType == 'Tree':
+            estimator = tree.DecisionTreeClassifier(criterion="entropy", **methodDict[method])
+        if clfType == 'RF':
+            estimator = RandomForestClassifier(criterion="entropy", **methodDict[method])
         metric,confusionMatrix = clfMetricCalculator(estimator,x_train,y_train,avgMethod=method)
+        # line = '\tIn' + method + 'method'
+        # f.write(line)
         print('\tIn',method,'method')
+        # f.write('\tIn',method,'method')
+        # f.write(str(metric))
         print(metric)
-        # make nice confusion matrix with labels
-        partiesLabels = y_train.iloc[:, 0].unique()
-        confusionMatrix = pd.DataFrame(confusionMatrix,columns=partiesLabels,index=partiesLabels)
-        print(confusionMatrix)
+        # f.write('achivhed with those hyperparams:')
+        print('achieved with those hyperparams:')
+        # f.write(str(**methodDict[method]))
+        print(**methodDict[method])
+        # # make nice confusion matrix with labels
+        # partiesLabels = y_train.iloc[:, 0].unique()
+        # confusionMatrix = pd.DataFrame(confusionMatrix,columns=partiesLabels,index=partiesLabels)
+        # f.write(confusionMatrix)
+    # f.close()
 
-
-def trainWithBestHyperparamsTree(methodDict, x_train, y_train):
-    """
-
-    :param methodDict:
-    :param x_train:
-    :param y_train:
-    :return:
-    """
-    print('\tTREE')
-    for method in methodDict:
-        estimator = tree.DecisionTreeClassifier(criterion="entropy", **methodDict[method])
-        metric, confusionMatrix = clfMetricCalculator(estimator, x_train, y_train, avgMethod=method)
-        print('\tIn', method, 'method')
-        print(metric)
-        # make nice confusion matrix with labels
-        partiesLabels = y_train.iloc[:, 0].unique()
-        confusionMatrix = pd.DataFrame(confusionMatrix, columns=partiesLabels, index=partiesLabels)
-        print(confusionMatrix)
 
 
