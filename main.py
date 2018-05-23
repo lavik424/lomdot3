@@ -109,20 +109,9 @@ def main():
     for type in clfTypes:
         trainWithBestHyperparams(type,hyperParamters[type],x_train,y_train,x_val,y_val)
 
-    # ## testing model calculator
-    # # estimator = KNeighborsClassifier(n_neighbors=5)
-    # estimator = tree.DecisionTreeClassifier(criterion="entropy", min_impurity_split=0.5, min_samples_split=0.005)
-    # partiesLabels = y_train.iloc[:, 0].unique()
-    # metric,confusionMatrix, estimator = clfMetricCalculator(estimator,x_train,y_train)
-    # print(metric)
-    # # make nice confusion matrix with labels
-    # confusionMatrix = pd.DataFrame(confusionMatrix,columns=partiesLabels,index=partiesLabels)
-    # print(confusionMatrix)
-    #
-    #
-    # # modifiedHistogram(confusionMatrix,partiesLabels)
-    #
-    #
+
+
+
     # labelsForTree = ['Blues', 'Browns', 'Greens', 'Greys', 'Oranges', 'Pinks',
     #                  'Purples', 'Reds', 'Turquoises', 'Whites', 'Yellows']
     # plotTree(estimator, x_train.columns, labelsForTree)

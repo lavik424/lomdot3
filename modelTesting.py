@@ -4,7 +4,7 @@ import pandas as pd
 # imports for classifier estimation
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import KFold
-from sklearn.metrics import classification_report
+
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
