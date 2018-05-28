@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 # imports for classifier estimation
-from sklearn.ensemble import RandomForestClassifier
+
 from sklearn.model_selection import KFold
 
 from sklearn.metrics import confusion_matrix
@@ -11,9 +11,12 @@ from sklearn.metrics import f1_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 
-
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import tree
+from sklearn.naive_bayes import GaussianNB
+from sklearn.naive_bayes import BernoulliNB
+from sklearn.naive_bayes import MultinomialNB
 
 
 def clfMetricCalculator(clf,X:pd.DataFrame,Y:pd.DataFrame,avgMethod='weighted',numOfSplits=4):

@@ -84,14 +84,36 @@ def modifiedHistogram(cm:pd.DataFrame,labels):
     plt.show()
     print('done')
 
+def saveEnvirment(x_train, x_val, x_test, y_train, y_val, y_test):
+    # save after all changes
+    x_train_final = x_train.copy()
+    x_train_final['Vote'] = y_train.values
+    x_val_final = x_val.copy()
+    x_val_final['Vote'] = y_val.values
+    x_test_final = x_test.copy()
+    x_test_final['Vote'] = y_test.values
+    # Save labels
+    x_train_final.to_csv("./x_train_final.csv")
+    x_val_final.to_csv("./x_val_final.csv")
+    x_test_final.to_csv("./x_test_final.csv")
+    y_train.to_csv("./y_train.csv")
+    y_val.to_csv("./y_val.csv")
+    y_test.to_csv("./y_test.csv")
 
 def main():
 
     (x_train, x_val, x_test, y_train, y_val, y_test) = loadEnvirment()
-
+    saveEnvirment(x_train, x_val, x_test, y_train, y_val, y_test)
     # modifiedHistogram(confusionMatrix,partiesLabels)
     import warnings
     warnings.filterwarnings("ignore") # todo fun ignoring that shit
+
+    clf = GaussianNB(priors=None)
+    metric,cm,clf = clfMetricCalculator(clf,x_train,y_train)
+    print(metric)
+    print(cm)
+
+    exit(3)
 
     clfTypes = ['Tree','KNN','RF']
     hyperParamters = {type:{'weighted':None,'macro':None} for type in clfTypes}
