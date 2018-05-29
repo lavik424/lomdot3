@@ -116,9 +116,9 @@ def main():
     #
     # exit(3)
 
-    clfTypes = ['SVM']#,'Tree','KNN','RF']
-    hyperParamters = {type:{'weighted':None,'macro':None, 'samples':None} for type in clfTypes}
-    averageMethodsForMeasures = ['weighted', 'macro', 'samples']
+    clfTypes = ['Tree']#,'Tree','KNN','RF']
+    hyperParamters = {type:{'weighted':None,'macro':None, 'Accuracy':None} for type in clfTypes}
+    averageMethodsForMeasures = ['weighted', 'macro', 'Accuracy']
 
     # train to find best hyperparameters for classifiers with different avg methods
     for method in averageMethodsForMeasures:
@@ -131,9 +131,11 @@ def main():
                 hyperParamters[type][method], _ = hyperParamsForSVM(x_train, y_train, method)
 
     # train the classifers with the best set of hyperparams
-    for type in clfTypes:
-        trainWithBestHyperparams(type,hyperParamters[type],x_train,y_train,x_val,y_val)
+    # for type in clfTypes:
+    #     for method in averageMethodsForMeasures:
+    #         estimator = trainWithBestHyperparams(type,hyperParamters[type][method],x_train,y_train,x_val,y_val)
 
+    estimator = trainWithBestHyperparams("Tree", hyperParamters["Tree"]['Accuracy'], x_train, y_train, x_val, y_val)
 
 
 

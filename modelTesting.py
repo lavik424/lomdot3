@@ -108,6 +108,7 @@ def hyperParamsForTreeOrRF(clfType,x_train,y_train,avgMethod='weighted'):
         hyperParams = {'min_impurity_split': [0.0, 1.0], 'min_samples_split': [0.0001, 0.05], 'n_estimators': [10, 150]}
         bestSetOfParams = {'min_impurity_split': 0, 'min_samples_split': 0, 'n_estimators': 0}
     measureToCompare = 'F1' if avgMethod == 'macro' or avgMethod == 'weighted' else 'Accuracy'
+    avgMethod = avgMethod if avgMethod == 'macro' or avgMethod == 'weighted' else None
     bestMeasure = 0
     for i in range(100):
         currSetOfParams = randomHyperParamsForClassifier(hyperParams)
@@ -137,6 +138,7 @@ def hyperParamsForKNN(x_train,y_train,avgMethod='weighted'):
     hyperParams = {'n_neighbors':[3,30]}
     bestSetOfParams = {'n_neighbors': 0}
     measureToCompare = 'F1' if avgMethod == 'macro' or avgMethod == 'weighted' else 'Accuracy'
+    avgMethod = avgMethod if avgMethod == 'macro' or avgMethod == 'weighted' else None
     bestMeasure = 0
     for i in range(3,30,2):
         currSetOfParams = {'n_neighbors': i}
@@ -157,6 +159,7 @@ def hyperParamsForSVM(x_train,y_train,avgMethod='weighted'):
     bestSetOfParams = {'C':0, 'cache_size':200, 'degree':3, 'gamma':2,'max_iter':10000}
     kernelParams = ['rbf','linear','poly']
     measureToCompare = 'F1' if avgMethod == 'macro' or avgMethod == 'weighted' else 'Accuracy'
+    avgMethod = avgMethod if avgMethod == 'macro' or avgMethod == 'weighted' else None
     bestMeasure = 0
     for i in range(50):
         print('Starting iteration number:', i)
@@ -208,11 +211,11 @@ def measuresWithoutKFold(clf,x_train,y_train,x_val,y_val,avgMethod='weighted'):
     recall = recall_score(y_val, pred, average=avgMethod)
     metricMap = {'Accuracy': accuracy, 'F1': f1, 'Precision': precision, 'Recall': recall}
 
-    return metricMap,confusionMatrix
+    return metricMap,confusionMatrix, clf
 
 
 
-def trainWithBestHyperparams(clfType,methodDict,x_train,y_train,x_val,y_val):
+def trainWithBestHyperparams(clfType, hyperParameters,x_train,y_train,x_val,y_val):
     """
     Function that train one clf by his hyperparams and returns his measurements on validation set
     :param clfType: 'Tree' for tree, 'RF' for random forest and 'KNN' for KNN
@@ -221,34 +224,34 @@ def trainWithBestHyperparams(clfType,methodDict,x_train,y_train,x_val,y_val):
     :param y_train:
     :param x_val
     :param y_val
-    :return:
+    :return: trained classifier
     """
     # f = open('./output','w')
     # line = '\t' + clfType
     # f.write(line)
     print('\t',clfType)
-    for method in methodDict:
-        if clfType == 'KNN':
-            estimator = KNeighborsClassifier(**methodDict[method])
-        elif clfType == 'Tree':
-            estimator = tree.DecisionTreeClassifier(criterion="entropy", **methodDict[method])
-        elif clfType == 'RF':
-            estimator = RandomForestClassifier(criterion="entropy", **methodDict[method])
-        elif clfType == 'SVM':
-            estimator = SVC(**methodDict[method])
-        metric,confusionMatrix = measuresWithoutKFold(estimator,x_train,y_train,x_val,y_val,avgMethod=method)
-        # line = '\tIn' + method + 'method'
-        # f.write(line)
-        print('\tIn',method,'method')
-        # f.write('\tIn',method,'method')
-        # f.write(str(metric))
-        print(metric)
-        # f.write('achivhed with those hyperparams:')
-        print('achieved with those hyperparams:')
-        # f.write(str(**methodDict[method]))
-        print(methodDict[method])
-        # # make nice confusion matrix with labels
-        # partiesLabels = y_train.iloc[:, 0].unique()
-        # confusionMatrix = pd.DataFrame(confusionMatrix,columns=partiesLabels,index=partiesLabels)
-        # f.write(confusionMatrix)
+    if clfType == 'KNN':
+        estimator = KNeighborsClassifier(**hyperParameters)
+    elif clfType == 'Tree':
+        estimator = tree.DecisionTreeClassifier(criterion="entropy", **hyperParameters)
+    elif clfType == 'RF':
+        estimator = RandomForestClassifier(criterion="entropy", **hyperParameters)
+    elif clfType == 'SVM':
+        estimator = SVC(**hyperParameters)
+    metric,confusionMatrix, estimator = measuresWithoutKFold(estimator,x_train,y_train,x_val,y_val)
+    # line = '\tIn' + method + 'method'
+    # f.write(line)
+    # print('\tIn',method,'method')
+    # f.write('\tIn',method,'method')
+    # f.write(str(metric))
+    print(metric)
+    # f.write('achivhed with those hyperparams:')
+    print('achieved with those hyperparams:')
+    # f.write(str(**methodDict[method]))
+    print(hyperParameters)
+    # # make nice confusion matrix with labels
+    # partiesLabels = y_train.iloc[:, 0].unique()
+    # confusionMatrix = pd.DataFrame(confusionMatrix,columns=partiesLabels,index=partiesLabels)
+    # f.write(confusionMatrix)
     # f.close()
+    return estimator
