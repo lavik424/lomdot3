@@ -2,3 +2,5 @@
 *.png
 plots/*
 *.gv*
+__pycache__/*
+input/*
