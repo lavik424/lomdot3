@@ -107,7 +107,7 @@ def hyperParamsForTreeOrRF(clfType,x_train,y_train,avgMethod='weighted'):
     if clfType == 'RF':
         hyperParams = {'min_impurity_split': [0.0, 1.0], 'min_samples_split': [0.0001, 0.05], 'n_estimators': [10, 150]}
         bestSetOfParams = {'min_impurity_split': 0, 'min_samples_split': 0, 'n_estimators': 0}
-    measureToCompare = 'F1' if avgMethod == 'macro' else 'Accuracy'
+    measureToCompare = 'F1' if avgMethod == 'macro' or avgMethod == 'weighted' else 'Accuracy'
     bestMeasure = 0
     for i in range(100):
         currSetOfParams = randomHyperParamsForClassifier(hyperParams)
@@ -116,7 +116,7 @@ def hyperParamsForTreeOrRF(clfType,x_train,y_train,avgMethod='weighted'):
             estimator = RandomForestClassifier(criterion="entropy", **currSetOfParams)
         if clfType == 'Tree':
             estimator = tree.DecisionTreeClassifier(criterion="entropy",**currSetOfParams)
-        metric, _,_ = clfMetricCalculator(estimator, x_train, y_train,avgMethod)
+        metric, _,_ = clfMetricCalculator(estimator, x_train, y_train, avgMethod)
         # print('with this set:\n',currSetOfParams)
         # print('we achived those scores\n',metric)
         if bestMeasure < metric[measureToCompare]:
@@ -136,7 +136,7 @@ def hyperParamsForKNN(x_train,y_train,avgMethod='weighted'):
     """
     hyperParams = {'n_neighbors':[3,30]}
     bestSetOfParams = {'n_neighbors': 0}
-    measureToCompare = 'Accuracy' if avgMethod == 'weighted' else 'F1'
+    measureToCompare = 'F1' if avgMethod == 'macro' or avgMethod == 'weighted' else 'Accuracy'
     bestMeasure = 0
     for i in range(3,30,2):
         currSetOfParams = {'n_neighbors': i}
@@ -156,7 +156,7 @@ def hyperParamsForSVM(x_train,y_train,avgMethod='weighted'):
     hyperParams = {'C':[-5,10], 'cache_size':[200,201], 'degree':[2,7], 'gamma':[-15,3],'max_iter':[10000,10001]}
     bestSetOfParams = {'C':0, 'cache_size':200, 'degree':3, 'gamma':2,'max_iter':10000}
     kernelParams = ['rbf','linear','poly']
-    measureToCompare = 'Accuracy' if avgMethod == 'weighted' else 'F1'
+    measureToCompare = 'F1' if avgMethod == 'macro' or avgMethod == 'weighted' else 'Accuracy'
     bestMeasure = 0
     for i in range(50):
         print('Starting iteration number:', i)

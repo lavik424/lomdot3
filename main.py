@@ -117,8 +117,8 @@ def main():
     # exit(3)
 
     clfTypes = ['SVM']#,'Tree','KNN','RF']
-    hyperParamters = {type:{'weighted':None,'macro':None} for type in clfTypes}
-    averageMethodsForMeasures = ['weighted','macro'] #,'samples']
+    hyperParamters = {type:{'weighted':None,'macro':None, 'samples':None} for type in clfTypes}
+    averageMethodsForMeasures = ['weighted', 'macro', 'samples']
 
     # train to find best hyperparameters for classifiers with different avg methods
     for method in averageMethodsForMeasures:
