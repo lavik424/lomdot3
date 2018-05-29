@@ -1,3 +1,5 @@
+import random
+
 import numpy as np
 import pandas as pd
 
@@ -17,6 +19,7 @@ from sklearn.tree import tree
 from sklearn.naive_bayes import GaussianNB
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.svm import SVC
 
 
 def clfMetricCalculator(clf,X:pd.DataFrame,Y:pd.DataFrame,avgMethod='weighted',numOfSplits=4):
@@ -87,6 +90,8 @@ def randomHyperParamsForClassifier(params):
                          else np.random.uniform(value[0],value[1])) for p,value in params.items()}
 
 
+
+
 def hyperParamsForTreeOrRF(clfType,x_train,y_train,avgMethod='weighted'):
     """
     function that train and find best hyperparams for RF/Tree
@@ -111,7 +116,7 @@ def hyperParamsForTreeOrRF(clfType,x_train,y_train,avgMethod='weighted'):
             estimator = RandomForestClassifier(criterion="entropy", **currSetOfParams)
         if clfType == 'Tree':
             estimator = tree.DecisionTreeClassifier(criterion="entropy",**currSetOfParams)
-        metric, _ = clfMetricCalculator(estimator, x_train, y_train,avgMethod)
+        metric, _,_ = clfMetricCalculator(estimator, x_train, y_train,avgMethod)
         # print('with this set:\n',currSetOfParams)
         # print('we achived those scores\n',metric)
         if bestMeasure < metric[measureToCompare]:
@@ -136,7 +141,7 @@ def hyperParamsForKNN(x_train,y_train,avgMethod='weighted'):
     for i in range(3,30,2):
         currSetOfParams = {'n_neighbors': i}
         estimator = KNeighborsClassifier(**currSetOfParams)
-        metric, _ = clfMetricCalculator(estimator, x_train, y_train,avgMethod)
+        metric, _, _ = clfMetricCalculator(estimator, x_train, y_train,avgMethod)
         # print('with this set:\n',currSetOfParams)
         # print('we achived those scores\n',metric)
         if bestMeasure < metric[measureToCompare]:
@@ -144,6 +149,33 @@ def hyperParamsForKNN(x_train,y_train,avgMethod='weighted'):
             bestSetOfParams = currSetOfParams
 
     return bestSetOfParams,bestMeasure
+
+
+def hyperParamsForSVM(x_train,y_train,avgMethod='weighted'):
+
+    hyperParams = {'C':[-5,10], 'cache_size':[200,201], 'degree':[2,7], 'gamma':[-15,3],'max_iter':[10000,10001]}
+    bestSetOfParams = {'C':0, 'cache_size':200, 'degree':3, 'gamma':2,'max_iter':10000}
+    kernelParams = ['rbf','linear','poly']
+    measureToCompare = 'Accuracy' if avgMethod == 'weighted' else 'F1'
+    bestMeasure = 0
+    for i in range(50):
+        print('Starting iteration number:', i)
+        currSetOfParams = randomHyperParamsForClassifier(hyperParams)
+        currSetOfParams['C'] = 2 ** currSetOfParams['C']
+        currSetOfParams['gamma'] = 2 ** currSetOfParams['gamma']
+        currSetOfParams['kernel'] = random.choice(kernelParams)
+        print(currSetOfParams)
+        estimator = SVC(**currSetOfParams)
+        metric, _, _ = clfMetricCalculator(estimator, x_train, y_train, avgMethod)
+        # print('with this set:\n',currSetOfParams)
+        # print('we achived those scores\n',metric)
+        if bestMeasure < metric[measureToCompare]:
+            bestMeasure = metric[measureToCompare]
+            bestSetOfParams = currSetOfParams
+
+    return bestSetOfParams, bestMeasure
+
+
 
 
 def measuresWithoutKFold(clf,x_train,y_train,x_val,y_val,avgMethod='weighted'):
@@ -178,13 +210,17 @@ def measuresWithoutKFold(clf,x_train,y_train,x_val,y_val,avgMethod='weighted'):
 
     return metricMap,confusionMatrix
 
+
+
 def trainWithBestHyperparams(clfType,methodDict,x_train,y_train,x_val,y_val):
     """
-    Function that train one clf by his hyperparams and returns his measurements
+    Function that train one clf by his hyperparams and returns his measurements on validation set
     :param clfType: 'Tree' for tree, 'RF' for random forest and 'KNN' for KNN
     :param methodDict: from ['weighted','macro'] , differs from one classification task to another
     :param x_train:
     :param y_train:
+    :param x_val
+    :param y_val
     :return:
     """
     # f = open('./output','w')
@@ -194,10 +230,12 @@ def trainWithBestHyperparams(clfType,methodDict,x_train,y_train,x_val,y_val):
     for method in methodDict:
         if clfType == 'KNN':
             estimator = KNeighborsClassifier(**methodDict[method])
-        if clfType == 'Tree':
+        elif clfType == 'Tree':
             estimator = tree.DecisionTreeClassifier(criterion="entropy", **methodDict[method])
-        if clfType == 'RF':
+        elif clfType == 'RF':
             estimator = RandomForestClassifier(criterion="entropy", **methodDict[method])
+        elif clfType == 'SVM':
+            estimator = SVC(**methodDict[method])
         metric,confusionMatrix = measuresWithoutKFold(estimator,x_train,y_train,x_val,y_val,avgMethod=method)
         # line = '\tIn' + method + 'method'
         # f.write(line)

@@ -104,18 +104,19 @@ def main():
 
     (x_train, x_val, x_test, y_train, y_val, y_test) = loadEnvirment()
     saveEnvirment(x_train, x_val, x_test, y_train, y_val, y_test)
+
     # modifiedHistogram(confusionMatrix,partiesLabels)
     import warnings
     warnings.filterwarnings("ignore") # todo fun ignoring that shit
 
-    clf = GaussianNB(priors=None)
-    metric,cm,clf = clfMetricCalculator(clf,x_train,y_train)
-    print(metric)
-    print(cm)
+    # clf = GaussianNB(priors=None)
+    # metric,cm,clf = clfMetricCalculator(clf,x_train,y_train)
+    # print(metric)
+    # print(cm)
+    #
+    # exit(3)
 
-    exit(3)
-
-    clfTypes = ['Tree','KNN','RF']
+    clfTypes = ['SVM']#,'Tree','KNN','RF']
     hyperParamters = {type:{'weighted':None,'macro':None} for type in clfTypes}
     averageMethodsForMeasures = ['weighted','macro'] #,'samples']
 
@@ -124,8 +125,10 @@ def main():
         for type in clfTypes:
             if type in ['Tree', 'RF']:
                 hyperParamters[type][method],_ = hyperParamsForTreeOrRF(type,x_train,y_train,method)
-            else:
+            elif type == 'KNN':
                 hyperParamters[type][method],_ = hyperParamsForKNN(x_train,y_train,method)
+            else:
+                hyperParamters[type][method], _ = hyperParamsForSVM(x_train, y_train, method)
 
     # train the classifers with the best set of hyperparams
     for type in clfTypes:
