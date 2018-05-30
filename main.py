@@ -6,6 +6,7 @@ from sklearn.tree import tree
 from TreePlot import plotTree
 from modelTesting import *
 import matplotlib.pyplot as plt
+from chooseBestClassifier import chooseBestClfForProblem
 
 
 def chooseColumns(currCols,oldCols):
@@ -116,7 +117,7 @@ def main():
     #
     # exit(3)
 
-    clfTypes = ['Tree']#,'Tree','KNN','RF']
+    clfTypes = ['Tree','SVM','KNN','RF']
     hyperParamters = {type:{'weighted':None,'macro':None, 'Accuracy':None} for type in clfTypes}
     averageMethodsForMeasures = ['weighted', 'macro', 'Accuracy']
 
@@ -130,14 +131,9 @@ def main():
             else:
                 hyperParamters[type][method], _ = hyperParamsForSVM(x_train, y_train, method)
 
-    # train the classifers with the best set of hyperparams
-    # for type in clfTypes:
-    #     for method in averageMethodsForMeasures:
-    #         estimator = trainWithBestHyperparams(type,hyperParamters[type][method],x_train,y_train,x_val,y_val)
 
-    estimator = trainWithBestHyperparams("Tree", hyperParamters["Tree"]['Accuracy'], x_train, y_train, x_val, y_val)
-
-
+    clfForProblem = chooseBestClfForProblem(hyperParamters,x_train,y_train,x_val,y_val)
+    print(clfForProblem)
 
     # labelsForTree = ['Blues', 'Browns', 'Greens', 'Greys', 'Oranges', 'Pinks',
     #                  'Purples', 'Reds', 'Turquoises', 'Whites', 'Yellows']
