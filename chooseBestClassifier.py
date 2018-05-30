@@ -28,7 +28,7 @@ def chooseBestClfForProblem(hyperParamters,x_train,y_train,x_val,y_val):
             trainedClf[type][method] = trainWithBestHyperparams\
                 (type,hyperParamters[type][method],x_train,y_train,x_val,y_val)
 
-    print(trainedClf)
+    # print(trainedClf)
     # find best for each problem
     clfForProblem['Problem1'] = trainedClf['Tree']['weighted']
     clfForProblem['Problem2'] = trainedClf['Tree']['macro']

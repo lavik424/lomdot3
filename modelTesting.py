@@ -2,6 +2,7 @@ import random
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 # imports for classifier estimation
 
@@ -110,7 +111,7 @@ def hyperParamsForTreeOrRF(clfType,x_train,y_train,avgMethod='weighted'):
     measureToCompare = 'F1' if avgMethod == 'macro' or avgMethod == 'weighted' else 'Accuracy'
     avgMethod = avgMethod if avgMethod == 'macro' or avgMethod == 'weighted' else None
     bestMeasure = 0
-    for i in range(100):
+    for i in range(10):
         currSetOfParams = randomHyperParamsForClassifier(hyperParams)
         if clfType == 'RF':
             print('RF Starting iteration number:', i)
@@ -161,7 +162,7 @@ def hyperParamsForSVM(x_train,y_train,avgMethod='weighted'):
     measureToCompare = 'F1' if avgMethod == 'macro' or avgMethod == 'weighted' else 'Accuracy'
     avgMethod = avgMethod if avgMethod == 'macro' or avgMethod == 'weighted' else None
     bestMeasure = 0
-    for i in range(50):
+    for i in range(10):
         print('SVM Starting iteration number:', i)
         currSetOfParams = randomHyperParamsForClassifier(hyperParams)
         currSetOfParams['C'] = 2 ** currSetOfParams['C']
@@ -204,6 +205,9 @@ def measuresWithoutKFold(clf,x_train,y_train,x_val,y_val,avgMethod='weighted'):
     pred = pd.DataFrame(pred, index=y_val.index)  # convert into col vector and match index
 
     confusionMatrix = confusion_matrix(y_val.values, pred, labels=partiesLabels)
+    # make nice confusion matrix with labels
+    partiesLabels = y_train.iloc[:, 0].unique()
+    confusionMatrix = pd.DataFrame(confusionMatrix,columns=partiesLabels,index=partiesLabels)
 
     accuracy = accuracy_score(y_val, pred)
     f1 = f1_score(y_val, pred, average=avgMethod)
@@ -211,7 +215,7 @@ def measuresWithoutKFold(clf,x_train,y_train,x_val,y_val,avgMethod='weighted'):
     recall = recall_score(y_val, pred, average=avgMethod)
     metricMap = {'Accuracy': accuracy, 'F1': f1, 'Precision': precision, 'Recall': recall}
 
-    return metricMap,confusionMatrix, clf
+    return metricMap,confusionMatrix, clf, pred
 
 
 
@@ -240,7 +244,7 @@ def trainWithBestHyperparams(clfType, hyperParameters,x_train,y_train,x_val,y_va
         estimator = SVC(**hyperParameters)
     elif clfType == 'NB':
         estimator = GaussianNB(**hyperParameters)
-    metric,confusionMatrix, estimator = measuresWithoutKFold(estimator,x_train,y_train,x_val,y_val)
+    metric,confusionMatrix, estimator, _ = measuresWithoutKFold(estimator,x_train,y_train,x_val,y_val)
 
     # print('\tIn',method,'method')
 
@@ -250,8 +254,21 @@ def trainWithBestHyperparams(clfType, hyperParameters,x_train,y_train,x_val,y_va
     #
     # print(hyperParameters)
 
-    # # make nice confusion matrix with labels
-    # partiesLabels = y_train.iloc[:, 0].unique()
-    # confusionMatrix = pd.DataFrame(confusionMatrix,columns=partiesLabels,index=partiesLabels)
+    # make nice confusion matrix with labels
+    partiesLabels = y_train.iloc[:, 0].unique()
+    confusionMatrix = pd.DataFrame(confusionMatrix,columns=partiesLabels,index=partiesLabels)
 
     return {'metric':metric,'cm':confusionMatrix, 'clf':estimator}
+
+
+
+
+def modifiedHistogram(cm:pd.DataFrame,labels):
+    counts = {x:np.sum(cm.loc[x,:]) for x in labels} # sum each col separately (predicted num of voters for each party)
+
+    # plt.plot(np.arange(10))
+    # plt.show()
+    plt.bar(np.arange(len(labels)), counts.values(), align='center')
+    plt.xticks(np.arange(len(labels)), counts.keys())
+    # plt.savefig("./sddf.png")
+    plt.show()

@@ -5,7 +5,8 @@ from sklearn.tree import tree
 
 from TreePlot import plotTree
 from modelTesting import *
-import matplotlib.pyplot as plt
+from ThreeProblemsSolver import oneFitAll, diffMethodsSolver
+
 from chooseBestClassifier import chooseBestClfForProblem
 
 
@@ -74,16 +75,7 @@ def loadEnvirment():
     return x_train, x_val, x_test, y_train, y_val, y_test
 
 
-def modifiedHistogram(cm:pd.DataFrame,labels):
-    counts = {x:np.sum(cm.loc[x,:]) for x in labels} # sum each col separately (predicted num of voters for each party)
 
-    # plt.plot(np.arange(10))
-    # plt.show()
-    plt.bar(np.arange(len(labels)), counts.values(), align='center')
-    plt.xticks(np.arange(len(labels)), counts.keys())
-    # plt.savefig("./sddf.png")
-    plt.show()
-    print('done')
 
 def saveEnvirment(x_train, x_val, x_test, y_train, y_val, y_test):
     # save after all changes
@@ -104,18 +96,12 @@ def saveEnvirment(x_train, x_val, x_test, y_train, y_val, y_test):
 def main():
 
     (x_train, x_val, x_test, y_train, y_val, y_test) = loadEnvirment()
-    saveEnvirment(x_train, x_val, x_test, y_train, y_val, y_test)
+    # saveEnvirment(x_train, x_val, x_test, y_train, y_val, y_test)
 
-    # modifiedHistogram(confusionMatrix,partiesLabels)
+
     import warnings
     warnings.filterwarnings("ignore") # todo fun ignoring that shit
 
-    # clf = GaussianNB(priors=None)
-    # metric,cm,clf = clfMetricCalculator(clf,x_train,y_train)
-    # print(metric)
-    # print(cm)
-    #
-    # exit(3)
 
     clfTypes = ['Tree','SVM','KNN','RF']
     hyperParamters = {type:{'weighted':None,'macro':None, 'Accuracy':None} for type in clfTypes}
@@ -133,12 +119,21 @@ def main():
 
 
     clfForProblem = chooseBestClfForProblem(hyperParamters,x_train,y_train,x_val,y_val)
-    print(clfForProblem)
+    # print(clfForProblem)
 
     # labelsForTree = ['Blues', 'Browns', 'Greens', 'Greys', 'Oranges', 'Pinks',
     #                  'Purples', 'Reds', 'Turquoises', 'Whites', 'Yellows']
     # plotTree(estimator, x_train.columns, labelsForTree)
 
+
+    # join train and val set for final testing
+    x_train = pd.concat([x_train,x_val])
+    y_train = pd.concat([y_train,y_val])
+
+
+
+    oneFitAll(clfForProblem['Problem3']['clf'],x_train,y_train,x_test,y_test)
+    diffMethodsSolver(clfForProblem,x_train,y_train,x_test,y_test)
 
 if __name__ == '__main__':
     main()
