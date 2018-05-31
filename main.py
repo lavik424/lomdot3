@@ -4,6 +4,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import tree
 
 from TreePlot import plotTree
+from changingVotingResults import changeAndItsPrice
 from modelTesting import *
 from ThreeProblemsSolver import oneFitAll, diffMethodsSolver
 
@@ -96,7 +97,7 @@ def saveEnvirment(x_train, x_val, x_test, y_train, y_val, y_test):
 def main():
 
     (x_train, x_val, x_test, y_train, y_val, y_test) = loadEnvirment()
-    # saveEnvirment(x_train, x_val, x_test, y_train, y_val, y_test)
+    saveEnvirment(x_train, x_val, x_test, y_train, y_val, y_test)
 
 
     import warnings
@@ -119,6 +120,7 @@ def main():
 
 
     clfForProblem = chooseBestClfForProblem(hyperParamters,x_train,y_train,x_val,y_val)
+
     # print(clfForProblem)
 
     # labelsForTree = ['Blues', 'Browns', 'Greens', 'Greys', 'Oranges', 'Pinks',
@@ -130,10 +132,28 @@ def main():
     x_train = pd.concat([x_train,x_val])
     y_train = pd.concat([y_train,y_val])
 
-
+    clf = RandomForestClassifier(bootstrap=True, class_weight=None, criterion='entropy',
+            max_depth=None, max_features='auto', max_leaf_nodes=None,
+            min_impurity_decrease=0.0,
+            min_impurity_split=0.07377805421821249, min_samples_leaf=1,
+            min_samples_split=0.0009114383778775707,
+            min_weight_fraction_leaf=0.0, n_estimators=57, n_jobs=1,
+            oob_score=False, random_state=None, verbose=0,
+            warm_start=False)
+    # clf = tree.DecisionTreeClassifier(class_weight=None, criterion='entropy', max_depth=None,
+    #         max_features=None, max_leaf_nodes=None,
+    #         min_impurity_decrease=0.0,
+    #         min_impurity_split=0.21812031598370685, min_samples_leaf=1,
+    #         min_samples_split=0.00011629305868913078,
+    #         min_weight_fraction_leaf=0.0, presort=False, random_state=None,
+    #         splitter='best')
 
     oneFitAll(clfForProblem['Problem3']['clf'],x_train,y_train,x_test,y_test)
     diffMethodsSolver(clfForProblem,x_train,y_train,x_test,y_test)
+
+
+    #changing winning party
+    changeAndItsPrice(clf,x_train,y_train,x_test,y_test)
 
 if __name__ == '__main__':
     main()

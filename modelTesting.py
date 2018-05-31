@@ -264,7 +264,7 @@ def trainWithBestHyperparams(clfType, hyperParameters,x_train,y_train,x_val,y_va
 
 
 def modifiedHistogram(cm:pd.DataFrame,labels):
-    counts = {x:np.sum(cm.loc[x,:]) for x in labels} # sum each col separately (predicted num of voters for each party)
+    counts = {x:np.sum(cm.loc[:,x]) for x in labels} # sum each col separately (predicted num of voters for each party)
 
     # plt.plot(np.arange(10))
     # plt.show()

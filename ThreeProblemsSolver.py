@@ -14,9 +14,10 @@ def oneFitAll(clf,x_train,y_train,x_test,y_test):
     :param y_test:
     :return:
     """
+    # print(x_test.describe())
     labels = y_train.iloc[:,0].unique()
     metricMap, confusionMatrix, clf, pred = measuresWithoutKFold(clf,x_train,y_train,x_test,y_test)
-    counts = {x: np.sum(confusionMatrix.loc[x, :]) for x in
+    counts = {x: np.sum(confusionMatrix.loc[:,x]) for x in
               labels}  # sum each col separately (predicted num of voters for each party)
 
     winner = max(counts,key=counts.get)
